@@ -8,13 +8,19 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Icon } from '../../components/ui/Icon';
+import { GlassCard } from '../../components/ui/GlassCard';
+import { Background } from '../../components/ui/Background';
+import { AnimatedLogo } from '../../components/ui/AnimatedLogo';
 import { colors, typography, spacing } from '../../config/theme';
+
+const { width, height } = Dimensions.get('window');
 
 export default function SignupScreen() {
   const [formData, setFormData] = useState({
@@ -82,11 +88,12 @@ export default function SignupScreen() {
 
   const passwordStrength = getPasswordStrength(formData.password);
 
+  const handleLogin = () => {
+    router.push('/(auth)/login');
+  };
+
   return (
-    <LinearGradient
-      colors={[colors.primary, colors.secondary]}
-      style={styles.container}
-    >
+    <Background>
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -96,143 +103,144 @@ export default function SignupScreen() {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            {/* Header */}
-            <View style={styles.headerContainer}>
-              <View style={styles.logoPlaceholder}>
-                <Icon name="truck" size={60} color={colors.text.inverse} />
-              </View>
-              <Text style={styles.title}>Create Account</Text>
-              <Text style={styles.subtitle}>Join DropIt and start delivering</Text>
+            {/* Logo */}
+            <AnimatedLogo size={100} style={styles.logoContainer} />
+
+            {/* Welcome Text */}
+            <View style={styles.welcomeContainer}>
+              <Text style={styles.welcomeText}>Create Account</Text>
+              <Text style={styles.subtitleText}>Join DropIt and start your journey</Text>
             </View>
 
-            {/* Signup Form */}
-            <View style={styles.formContainer}>
-              <Input
-                label="Full Name"
-                placeholder="Enter your full name"
-                value={formData.name}
-                onChangeText={(text) => setFormData({ ...formData, name: text })}
-                leftIcon={<Icon name="user" size={20} color={colors.text.light} />}
-              />
+            {/* Signup Card */}
+            <View style={styles.cardContainer}>
+              <GlassCard style={styles.formCard}>
+                <View style={styles.inputGroup}>
+                  <Input
+                    placeholder="Full name"
+                    value={formData.name}
+                    onChangeText={(text) => setFormData({ ...formData, name: text })}
+                    leftIcon={<Icon name="user" size={20} color={colors.text.muted} />}
+                    style={styles.input}
+                  />
 
-              <Input
-                label="Email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChangeText={(text) => setFormData({ ...formData, email: text })}
-                keyboardType="email-address"
-                leftIcon={<Icon name="mail" size={20} color={colors.text.light} />}
-              />
+                  <Input
+                    placeholder="Email address"
+                    value={formData.email}
+                    onChangeText={(text) => setFormData({ ...formData, email: text })}
+                    keyboardType="email-address"
+                    leftIcon={<Icon name="mail" size={20} color={colors.text.muted} />}
+                    style={styles.input}
+                  />
 
-              <Input
-                label="Phone Number"
-                placeholder="Enter your phone number"
-                value={formData.phone}
-                onChangeText={(text) => setFormData({ ...formData, phone: text })}
-                keyboardType="phone-pad"
-                leftIcon={<Icon name="phone" size={20} color={colors.text.light} />}
-              />
+                  <Input
+                    placeholder="Phone number"
+                    value={formData.phone}
+                    onChangeText={(text) => setFormData({ ...formData, phone: text })}
+                    keyboardType="phone-pad"
+                    leftIcon={<Icon name="phone" size={20} color={colors.text.muted} />}
+                    style={styles.input}
+                  />
 
-              <Input
-                label="Password"
-                placeholder="Create a password"
-                value={formData.password}
-                onChangeText={(text) => setFormData({ ...formData, password: text })}
-                secureTextEntry={!showPassword}
-                rightIcon={
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <Icon
-                      name={showPassword ? 'eyeOff' : 'eye'}
-                      size={20}
-                      color={colors.text.light}
-                    />
-                  </TouchableOpacity>
-                }
-              />
+                  <Input
+                    placeholder="Create password"
+                    value={formData.password}
+                    onChangeText={(text) => setFormData({ ...formData, password: text })}
+                    secureTextEntry={!showPassword}
+                    rightIcon={
+                      <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                        <Icon
+                          name={showPassword ? 'eyeOff' : 'eye'}
+                          size={20}
+                          color={colors.text.muted}
+                        />
+                      </TouchableOpacity>
+                    }
+                    style={styles.input}
+                  />
 
-              {formData.password.length > 0 && (
-                <View style={styles.passwordStrengthContainer}>
-                  <View style={styles.passwordStrengthBar}>
-                    <View
-                      style={[
-                        styles.passwordStrengthFill,
-                        {
-                          width: `${(passwordStrength / 4) * 100}%`,
-                          backgroundColor: getPasswordStrengthColor(passwordStrength),
-                        },
-                      ]}
-                    />
+                  {formData.password.length > 0 && (
+                    <View style={styles.passwordStrengthContainer}>
+                      <View style={styles.passwordStrengthBar}>
+                        <View
+                          style={[
+                            styles.passwordStrengthFill,
+                            {
+                              width: `${(passwordStrength / 4) * 100}%`,
+                              backgroundColor: getPasswordStrengthColor(passwordStrength),
+                            },
+                          ]}
+                        />
+                      </View>
+                      <Text
+                        style={[
+                          styles.passwordStrengthText,
+                          { color: getPasswordStrengthColor(passwordStrength) },
+                        ]}
+                      >
+                        {getPasswordStrengthText(passwordStrength)}
+                      </Text>
+                    </View>
+                  )}
+
+                  <Input
+                    placeholder="Confirm password"
+                    value={formData.confirmPassword}
+                    onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
+                    secureTextEntry={!showConfirmPassword}
+                    rightIcon={
+                      <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                        <Icon
+                          name={showConfirmPassword ? 'eyeOff' : 'eye'}
+                          size={20}
+                          color={colors.text.muted}
+                        />
+                      </TouchableOpacity>
+                    }
+                    style={styles.input}
+                  />
+                </View>
+
+                <TouchableOpacity
+                  style={styles.termsContainer}
+                  onPress={() => setAcceptedTerms(!acceptedTerms)}
+                >
+                  <View style={[styles.checkbox, acceptedTerms && styles.checkboxChecked]}>
+                    {acceptedTerms && <Icon name="check" size={14} color={colors.text.inverse} />}
                   </View>
-                  <Text
-                    style={[
-                      styles.passwordStrengthText,
-                      { color: getPasswordStrengthColor(passwordStrength) },
-                    ]}
-                  >
-                    {getPasswordStrengthText(passwordStrength)}
+                  <Text style={styles.termsText}>
+                    I agree to the{' '}
+                    <Text style={styles.termsLink}>Terms & Conditions</Text>
                   </Text>
-                </View>
-              )}
-
-              <Input
-                label="Confirm Password"
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
-                secureTextEntry={!showConfirmPassword}
-                rightIcon={
-                  <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    <Icon
-                      name={showConfirmPassword ? 'eyeOff' : 'eye'}
-                      size={20}
-                      color={colors.text.light}
-                    />
-                  </TouchableOpacity>
-                }
-              />
-
-              <TouchableOpacity
-                style={styles.termsContainer}
-                onPress={() => setAcceptedTerms(!acceptedTerms)}
-              >
-                <View style={styles.checkbox}>
-                  {acceptedTerms && <Icon name="check" size={16} color={colors.text.inverse} />}
-                </View>
-                <Text style={styles.termsText}>
-                  I agree to the{' '}
-                  <Text style={styles.termsLink}>Terms & Conditions</Text>
-                </Text>
-              </TouchableOpacity>
-
-              <Button
-                variant="primary"
-                size="lg"
-                onPress={handleSignup}
-                loading={loading}
-                disabled={!acceptedTerms}
-                style={styles.signupButton}
-              >
-                Create Account
-              </Button>
-
-              <View style={styles.loginContainer}>
-                <Text style={styles.loginText}>Already have an account? </Text>
-                <TouchableOpacity>
-                  <Text style={styles.loginLink}>Login</Text>
                 </TouchableOpacity>
-              </View>
+
+                <Button
+                  variant="gradient"
+                  size="lg"
+                  onPress={handleSignup}
+                  loading={loading}
+                  disabled={!acceptedTerms}
+                  style={styles.signupButton}
+                >
+                  Create Account
+                </Button>
+
+                <View style={styles.loginContainer}>
+                  <Text style={styles.loginText}>Already have an account? </Text>
+                  <TouchableOpacity onPress={handleLogin}>
+                    <Text style={styles.loginLink}>Sign In</Text>
+                  </TouchableOpacity>
+                </View>
+              </GlassCard>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
-    </LinearGradient>
+    </Background>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   safeArea: {
     flex: 1,
   },
@@ -242,47 +250,52 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
+    paddingTop: spacing.xxl,
+    justifyContent: 'center',
+    minHeight: height,
   },
-  headerContainer: {
+  logoContainer: {
     alignItems: 'center',
     marginBottom: spacing.xl,
   },
-  logoPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
+  welcomeContainer: {
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.xxl,
   },
-  title: {
+  welcomeText: {
     fontFamily: typography.fonts.heading,
-    fontSize: typography.sizes.xxxl,
-    color: colors.text.inverse,
+    fontSize: typography.sizes.xxxxl,
+    color: colors.text.primary,
     fontWeight: typography.weights.bold,
     marginBottom: spacing.xs,
+    textAlign: 'center',
   },
-  subtitle: {
+  subtitleText: {
     fontFamily: typography.fonts.body,
-    fontSize: typography.sizes.base,
-    color: colors.text.inverse,
-    opacity: 0.9,
+    fontSize: typography.sizes.lg,
+    color: colors.text.light,
+    textAlign: 'center',
+    opacity: 0.8,
   },
-  formContainer: {
-    backgroundColor: colors.background,
-    borderRadius: 24,
-    padding: spacing.xl,
-    ...colors.shadows?.lg,
+  cardContainer: {
+    marginHorizontal: spacing.md,
+  },
+  formCard: {
+    padding: spacing.xxl,
+  },
+  inputGroup: {
+    marginBottom: spacing.lg,
+  },
+  input: {
+    marginBottom: spacing.md,
   },
   passwordStrengthContainer: {
     marginTop: -spacing.sm,
     marginBottom: spacing.md,
   },
   passwordStrengthBar: {
-    height: 4,
-    backgroundColor: colors.backgroundDark,
+    height: 3,
+    backgroundColor: colors.glassBorder,
     borderRadius: 2,
     overflow: 'hidden',
   },
@@ -298,25 +311,32 @@ const styles = StyleSheet.create({
   },
   termsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
+    alignItems: 'flex-start',
+    marginBottom: spacing.xl,
+    paddingVertical: spacing.xs,
   },
   checkbox: {
     width: 20,
     height: 20,
-    borderRadius: 4,
+    borderRadius: 6,
     borderWidth: 2,
-    borderColor: colors.primary,
-    backgroundColor: colors.primary,
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.glass,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.sm,
+    marginTop: 2,
+  },
+  checkboxChecked: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   termsText: {
     fontFamily: typography.fonts.body,
     fontSize: typography.sizes.sm,
-    color: colors.text.primary,
+    color: colors.text.light,
     flex: 1,
+    lineHeight: 20,
   },
   termsLink: {
     color: colors.primary,
@@ -329,16 +349,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: spacing.md,
   },
   loginText: {
     fontFamily: typography.fonts.body,
     fontSize: typography.sizes.base,
-    color: colors.text.primary,
+    color: colors.text.light,
   },
   loginLink: {
     fontFamily: typography.fonts.body,
     fontSize: typography.sizes.base,
     color: colors.primary,
     fontWeight: typography.weights.bold,
+    marginLeft: spacing.xs,
   },
 });

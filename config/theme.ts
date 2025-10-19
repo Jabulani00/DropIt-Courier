@@ -1,22 +1,37 @@
 export const colors = {
-  primary: '#D35400',      // Burnt Orange
+  // Primary Colors - Burnt Orange
+  primary: '#D35400',      // Burnt Orange - Energy
   primaryLight: '#E67E22',
   primaryDark: '#BA4A00',
+  primaryGradient: ['#D35400', '#E67E22'],
   
-  secondary: '#4E2A1E',    // Deep Brown
+  // Secondary Colors - Deep Brown
+  secondary: '#4E2A1E',    // Deep Brown - Reliability
   secondaryLight: '#6E3A2E',
   secondaryDark: '#2E1A0E',
   
-  background: '#F5E6CA',   // Cream White
+  // Background Colors - Cream White
+  background: '#F5E6CA',   // Cream White - Warmth
   backgroundDark: '#E5D6BA',
+  backgroundLight: '#FDF8F0',
+  backgroundGradient: ['#F5E6CA', '#4E2A1E'],
   
+  // Glass/Card Colors
+  glass: 'rgba(245, 230, 202, 0.95)',
+  glassDark: 'rgba(245, 230, 202, 0.85)',
+  glassBorder: 'rgba(78, 42, 30, 0.1)',
+  
+  // Text Colors
   text: {
     primary: '#4E2A1E',
     secondary: '#6E3A2E',
     light: '#8E6A5E',
-    inverse: '#F5E6CA'
+    inverse: '#F5E6CA',
+    muted: '#A68B7A',
+    onGlass: '#4E2A1E'
   },
   
+  // Status Colors
   status: {
     success: '#27AE60',
     warning: '#F39C12',
@@ -24,6 +39,7 @@ export const colors = {
     info: '#3498DB'
   },
   
+  // Delivery Status Colors
   delivery: {
     pending: '#F39C12',
     accepted: '#3498DB',
@@ -36,10 +52,13 @@ export const colors = {
 
 export const typography = {
   fonts: {
-    heading: 'Raleway-Bold',
-    body: 'Lora-Regular',
+    heading: 'Raleway-Bold',      // Bold, modern headers
+    headingLight: 'Raleway-Regular',
+    body: 'Lora-Regular',         // Elegant, readable body text
     bodyItalic: 'Lora-Italic',
-    button: 'Raleway-Regular'
+    button: 'Raleway-SemiBold',
+    caption: 'Lora-Regular',
+    placeholder: 'Raleway-Medium'  // For input placeholders
   },
   
   sizes: {
@@ -49,7 +68,8 @@ export const typography = {
     lg: 18,
     xl: 20,
     xxl: 24,
-    xxxl: 32
+    xxxl: 32,
+    xxxxl: 40
   },
   
   weights: {
@@ -98,5 +118,21 @@ export const shadows = {
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 5
+  },
+  // Glass card shadows
+  glass: {
+    shadowColor: '#4E2A1E',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 8
+  },
+  // Floating card shadows
+  floating: {
+    shadowColor: '#4E2A1E',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.25,
+    shadowRadius: 32,
+    elevation: 12
   }
 };

@@ -44,20 +44,25 @@ export const Input: React.FC<InputProps> = ({
   const getInputContainerStyle = (): ViewStyle => ({
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.background,
+    backgroundColor: colors.glass,
     borderWidth: 1,
-    borderColor: error ? colors.status.error : isFocused ? colors.primary : colors.secondary,
+    borderColor: error ? colors.status.error : isFocused ? colors.primary : colors.glassBorder,
     borderRadius: borderRadius.lg,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
-    minHeight: 48,
+    minHeight: 56,
+    shadowColor: isFocused ? colors.primary : colors.secondary,
+    shadowOffset: { width: 0, height: isFocused ? 4 : 2 },
+    shadowOpacity: isFocused ? 0.2 : 0.1,
+    shadowRadius: isFocused ? 8 : 4,
+    elevation: isFocused ? 4 : 2,
   });
 
   const getInputStyle = (): TextStyle => ({
     flex: 1,
     fontFamily: typography.fonts.body,
     fontSize: typography.sizes.base,
-    color: colors.text.primary,
+    color: colors.text.onGlass,
     textAlignVertical: multiline ? 'top' : 'center',
   });
 
@@ -97,7 +102,7 @@ export const Input: React.FC<InputProps> = ({
         <TextInput
           style={getInputStyle()}
           placeholder={placeholder}
-          placeholderTextColor={colors.text.light}
+          placeholderTextColor={colors.text.muted}
           value={value}
           onChangeText={onChangeText}
           secureTextEntry={secureTextEntry}

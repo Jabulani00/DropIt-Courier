@@ -1,31 +1,98 @@
-import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import React, { useRef } from 'react';
+import { TouchableOpacity, Text, Animated, ViewStyle, TextStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, typography, spacing, borderRadius } from '../../config/theme';
 
-interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'gradient' | 'glass';
-  size?: 'sm' | 'md' | 'lg';
-  onPress: () => void;
-  disabled?: boolean;
-  loading?: boolean;
-  icon?: React.ReactNode;
-  iconPosition?: 'left' | 'right';
-  children: React.ReactNode;
-  style?: ViewStyle;
+// Optional haptics import with fallback
+let Haptics: any = null;
+try {
+  Haptics = require('expo-haptics');
+} catch (error) {
+  // Haptics not available, will use fallback
 }
 
-export const Button: React.FC<ButtonProps> = ({
+interface InteractiveButtonProps {
+  children: React.ReactNode;
+  onPress: () => void;
+  variant?: 'primary' | 'gradient' | 'glass' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  loading?: boolean;
+  style?: ViewStyle;
+  hapticFeedback?: boolean;
+}
+
+export const InteractiveButton: React.FC<InteractiveButtonProps> = ({
+  children,
+  onPress,
   variant = 'primary',
   size = 'md',
-  onPress,
   disabled = false,
   loading = false,
-  icon,
-  iconPosition = 'left',
-  children,
   style,
+  hapticFeedback = true,
 }) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const opacityAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    if (disabled || loading) return;
+    
+    if (hapticFeedback && Haptics) {
+      try {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      } catch (error) {
+        // Haptics not available, continue without feedback
+      }
+    }
+    
+    Animated.parallel([
+      Animated.spring(scaleAnim, {
+        toValue: 0.95,
+        useNativeDriver: true,
+        tension: 300,
+        friction: 10,
+      }),
+      Animated.timing(opacityAnim, {
+        toValue: 0.8,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const handlePressOut = () => {
+    if (disabled || loading) return;
+    
+    Animated.parallel([
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+        tension: 300,
+        friction: 10,
+      }),
+      Animated.timing(opacityAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const handlePress = () => {
+    if (disabled || loading) return;
+    
+    if (hapticFeedback && Haptics) {
+      try {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      } catch (error) {
+        // Haptics not available, continue without feedback
+      }
+    }
+    
+    onPress();
+  };
+
   const getButtonStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
       flexDirection: 'row',
@@ -35,30 +102,16 @@ export const Button: React.FC<ButtonProps> = ({
       borderWidth: variant === 'outline' ? 1 : 0,
     };
 
-    // Size styles
     const sizeStyles = {
       sm: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm, minHeight: 36 },
       md: { paddingHorizontal: spacing.lg, paddingVertical: spacing.md, minHeight: 48 },
       lg: { paddingHorizontal: spacing.xl, paddingVertical: spacing.lg, minHeight: 56 },
     };
 
-    // Variant styles
     const variantStyles = {
       primary: {
         backgroundColor: colors.primary,
         borderColor: colors.primary,
-      },
-      secondary: {
-        backgroundColor: colors.secondary,
-        borderColor: colors.secondary,
-      },
-      outline: {
-        backgroundColor: 'transparent',
-        borderColor: colors.primary,
-      },
-      ghost: {
-        backgroundColor: 'transparent',
-        borderColor: 'transparent',
       },
       gradient: {
         backgroundColor: 'transparent',
@@ -68,13 +121,18 @@ export const Button: React.FC<ButtonProps> = ({
         backgroundColor: colors.glass,
         borderColor: colors.glassBorder,
       },
+      outline: {
+        backgroundColor: 'transparent',
+        borderColor: colors.primary,
+      },
     };
 
     return {
       ...baseStyle,
       ...sizeStyles[size],
       ...variantStyles[variant],
-      opacity: disabled || loading ? 0.6 : 1,
+      opacity: disabled || loading ? 0.6 : opacityAnim,
+      transform: [{ scale: scaleAnim }],
     };
   };
 
@@ -92,11 +150,9 @@ export const Button: React.FC<ButtonProps> = ({
 
     const variantStyles = {
       primary: { color: colors.text.inverse },
-      secondary: { color: colors.text.inverse },
-      outline: { color: colors.primary },
-      ghost: { color: colors.primary },
       gradient: { color: colors.text.inverse },
       glass: { color: colors.text.onGlass },
+      outline: { color: colors.primary },
     };
 
     return {
@@ -107,24 +163,6 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const renderButton = () => {
-    const buttonContent = (
-      <>
-        {loading ? (
-          <ActivityIndicator color={variant === 'primary' || variant === 'secondary' || variant === 'gradient' ? colors.text.inverse : colors.primary} />
-        ) : (
-          <>
-            {icon && iconPosition === 'left' && (
-              <>{icon}</>
-            )}
-            <Text style={getTextStyle()}>{children}</Text>
-            {icon && iconPosition === 'right' && (
-              <>{icon}</>
-            )}
-          </>
-        )}
-      </>
-    );
-
     if (variant === 'gradient') {
       return (
         <LinearGradient
@@ -134,12 +172,13 @@ export const Button: React.FC<ButtonProps> = ({
           style={[getButtonStyle(), style]}
         >
           <TouchableOpacity
-            onPress={onPress}
+            onPress={handlePress}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
             disabled={disabled || loading}
-            activeOpacity={0.8}
             style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
           >
-            {buttonContent}
+            <Text style={getTextStyle()}>{children}</Text>
           </TouchableOpacity>
         </LinearGradient>
       );
@@ -148,11 +187,12 @@ export const Button: React.FC<ButtonProps> = ({
     return (
       <TouchableOpacity
         style={[getButtonStyle(), style]}
-        onPress={onPress}
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
         disabled={disabled || loading}
-        activeOpacity={0.8}
       >
-        {buttonContent}
+        <Text style={getTextStyle()}>{children}</Text>
       </TouchableOpacity>
     );
   };
